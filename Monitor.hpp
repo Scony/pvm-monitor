@@ -1,6 +1,13 @@
+#include <vector>
+
+#define MONITOR_BYE 1
+
 class Monitor
 {
 protected:
+  Monitor();
+  ~Monitor();
+
   class mutex
   {
   public:
@@ -25,4 +32,9 @@ protected:
 
 private:
   static int mutexNextId;
+  int tid;
+  std::vector<int> vTids;
+  std::vector<int> vDone;
+
+  bool done();
 };

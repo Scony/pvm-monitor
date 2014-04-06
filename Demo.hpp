@@ -2,5 +2,9 @@
 
 class Demo : public Monitor
 {
-  mutex mx[2];
+public:
+  void print(int id);
+
+private:
+  mutex mx;
 };
