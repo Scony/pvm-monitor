@@ -1,6 +1,8 @@
 #include <vector>
 
-#define MONITOR_BYE 1
+#define MONITOR_DONE 1
+
+#define THRESHOLD 100
 
 class Monitor
 {
@@ -31,10 +33,13 @@ protected:
   // };
 
 private:
+  static int monitorNextId;
   static int mutexNextId;
+  int id;
   int tid;
   std::vector<int> vTids;
   std::vector<int> vDone;
 
   bool done();
+  void recv();
 };

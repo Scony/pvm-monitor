@@ -15,9 +15,10 @@ int main()
 
   cout << "TID:" << mytid << endl;
 
-  Demo d;
+  Demo * d = new Demo;
   for(int i = 0; i < 10; i++)
-    d.print(mytid);
+    d->print(mytid);
+  delete d;
   // printf("TID: %d %x (parent %d %x) \n",mytid,mytid,partid,partid);
   // sleep(rand() % 6);
 
