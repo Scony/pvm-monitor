@@ -11,32 +11,21 @@ using namespace std;
 Monitor::Monitor()
 {
   id = Monitor::monitorNextId++;
-  cout << "MID: " << id << endl;
   tid = pvm_mytid();
   struct pvmtaskinfo * taskp;
   int ntask;
   int info = pvm_tasks(0,&ntask,&taskp);
   for(int i = 0; i < ntask; i++)
     if(taskp[i].ti_ptid != 0 && taskp[i].ti_tid != tid)
-      {
-	cout << "MATE: " << taskp[i].ti_tid << endl;
-	vTids.push_back(taskp[i].ti_tid);
-      }
+      vTids.push_back(taskp[i].ti_tid);
 }
 
 Monitor::~Monitor()
 {
-  cout << "TAG" << endl;
   for(vector<int>::iterator i = vTids.begin(); i != vTids.end(); i++)
-    {
-      cout << "PSEND: " << *i << " :: "<< pvm_psend(*i,MONITOR_DONE+id*THRESHOLD,&tid,1,PVM_INT) << endl;
-      // pvm_initsend( PvmDataDefault );
-      // pvm_pkint( &tid, 1, 1 );
-      // pvm_send( *i, MONITOR_DONE+id*THRESHOLD );
-    }
+    pvm_psend(*i,MONITOR_DONE+id*THRESHOLD,&tid,1,PVM_INT);
   while(!done())
     recv();
-  cout << "D" << (int)done() << endl;
 }
 
 bool Monitor::done()
@@ -52,19 +41,28 @@ void Monitor::recv()
 
   // MONITOR_DONE
   bufid = pvm_nrecv(-1,MONITOR_DONE+id*THRESHOLD);
-  cout << "BUFID: " << bufid << endl;
   if(bufid > 0)
     {
       int who;
       int info = pvm_upkint(&who,1,1);
       if(info < 0)
 	;			// FIXME: exception ?
-      cout << "WHO: " << who << endl;
       vDone.push_back(who);
     }
 
   // dont waste CPU
   usleep(100000);
+}
+
+Monitor::_export::_export(mutex * mx)
+{
+  this->mx = mx;
+  mx->lock();
+}
+
+Monitor::_export::~_export()
+{
+  mx->unlock();
 }
 
 int Monitor::monitorNextId = 0;
@@ -77,10 +75,10 @@ Monitor::mutex::mutex()
 
 void Monitor::mutex::lock()
 {
-  // 
+  cout << "lock\n";
 }
 
 void Monitor::mutex::unlock()
 {
-  // 
+  cout << "unlock\n";
 }

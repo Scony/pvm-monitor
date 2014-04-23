@@ -4,6 +4,8 @@
 
 #define THRESHOLD 100
 
+#define EXPORT _export __exp(&_mx);
+
 class Monitor
 {
 protected:
@@ -20,6 +22,17 @@ protected:
   private:
     int id;
   };
+
+  class _export
+  {
+  public:
+    _export(mutex * mx);
+    ~_export();
+  private:
+    mutex * mx;
+  };
+
+  mutex _mx;
 
   // class condition
   // {

@@ -4,9 +4,8 @@
 
 using namespace std;
 
-void Demo::print(int id)
+void Demo::print()
 {
-  mx.lock();
-  cout << id << ": in print\n";
-  mx.unlock();
+  EXPORT;
+  cout << "in print\n";
 }
