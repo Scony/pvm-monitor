@@ -4,12 +4,15 @@
 #include <list>
 
 #include "Pvm.hpp"
+#include "Condition.hpp"
 
 #define MONITOR_DONE 1
-
-#define MUTEX_REQUEST 10
-#define MUTEX_RESPONSE 11
-#define MUTEX_RELEASE 12
+#define MUTEX_REQUEST 2
+#define MUTEX_RESPONSE 3
+#define MUTEX_RELEASE 4
+#define CONDITION_ENQUEUE 5
+#define CONDITION_DEQUEUE 6
+#define CONDITION_SIGNAL 7
 
 #define EXPORT _export _exp;
 
@@ -28,12 +31,6 @@ protected:
     _export();
     ~_export();
   };
-
-  // class condition
-  // {
-  //   void wait();
-  //   void signal();
-  // };
 
   // class sint			/* ? */
   // {
