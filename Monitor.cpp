@@ -33,6 +33,9 @@ void Monitor::recv()
 {
   int bufid;
 
+  // mutex recv
+  Mutex::getInstance().recv();
+
   // MONITOR_DONE
   bufid = pvm_nrecv(-1,MONITOR_DONE);
   if(bufid > 0)
@@ -43,7 +46,7 @@ void Monitor::recv()
     }
 
   // dont waste CPU
-  usleep(100000);
+  // usleep(100000);
 }
 
 Monitor::_export::_export()
