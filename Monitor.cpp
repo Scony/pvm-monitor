@@ -1,10 +1,10 @@
 #include <iostream>
 #include <pvm3.h>
-#include <stdio.h>
 #include <algorithm>
 #include <unistd.h>
 
 #include "Monitor.hpp"
+#include "Mutex.hpp"
 
 using namespace std;
 
@@ -16,19 +16,17 @@ Monitor::Monitor() :
 
 Monitor::~Monitor()
 {
-  // for(vector<int>::iterator i = vTids.begin(); i != vTids.end(); i++)
-  //   pvm_psend(*i,MONITOR_DONE+id*THRESHOLD,&tid,1,PVM_INT);
-  // while(!done())
-  //   recv();
-  cout << "x";
-  // pvm_exit();
+  for(vector<int>::iterator i = pvm.vTids.begin(); i != pvm.vTids.end(); i++)
+    pvm_psend(*i,MONITOR_DONE,&pvm.tid,1,PVM_INT);
+  while(!done())
+    recv();
 }
 
 bool Monitor::done()
 {
-  // sort(vTids.begin(),vTids.end());
-  // sort(vDone.begin(),vDone.end());
-  // return vTids == vDone;
+  sort(pvm.vTids.begin(),pvm.vTids.end());
+  sort(vDone.begin(),vDone.end());
+  return pvm.vTids == vDone;
 }
 
 void Monitor::recv()
@@ -50,11 +48,10 @@ void Monitor::recv()
 
 Monitor::_export::_export()
 {
-  // this->mx = mx;
-  // mx->lock();
+  Mutex::getInstance().lock();
 }
 
 Monitor::_export::~_export()
 {
-  // mx->unlock();
+  Mutex::getInstance().unlock();
 }

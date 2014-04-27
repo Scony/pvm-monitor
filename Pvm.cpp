@@ -1,5 +1,6 @@
+#include <iostream>
+
 #include "Pvm.hpp"
-#include <stdio.h>
 
 Pvm & Pvm::getInstance()
 {
@@ -20,5 +21,6 @@ Pvm::Pvm()
 
 Pvm::~Pvm()
 {
-  printf("EO_PVM\n");
+  std::cout << "PVM_EXIT\n";
+  pvm_exit();
 }

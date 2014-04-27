@@ -1,8 +1,9 @@
-#include "Mutex.hpp"
 #include <iostream>
-using namespace std;
 
-Mutex::Mutex()
+#include "Mutex.hpp"
+
+Mutex::Mutex() :
+  pvm(Pvm::getInstance())
 {
 }
 
@@ -14,10 +15,10 @@ Mutex & Mutex::getInstance()
 
 void Mutex::lock()
 {
-  cout << "lock\n";
+  std::cout << "lock\n";
 }
 
 void Mutex::unlock()
 {
-  cout << "unlock\n";
+  std::cout << "unlock\n";
 }

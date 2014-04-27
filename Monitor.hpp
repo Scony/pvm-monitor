@@ -2,11 +2,10 @@
 #define MONITOR_HPP
 
 #include "Pvm.hpp"
-#include "Mutex.hpp"
 
 #define MONITOR_DONE 1
 
-#define EXPORT _export _exp();
+#define EXPORT _export _exp;
 
 class Monitor
 {
