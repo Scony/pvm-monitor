@@ -1,16 +1,10 @@
-#include <pvm3.h>
-
 #include "Demo.hpp"
 
 int main()
 {
-  pvm_mytid();
-
-  Demo * d = new Demo;
+  Demo d;
   for(int i = 0; i < 10; i++)
-    d->print();
-  delete d;
+    d.print();
 
-  pvm_exit();
   return 0;
 }

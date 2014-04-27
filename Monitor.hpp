@@ -1,43 +1,32 @@
-#include <vector>
+#ifndef MONITOR_HPP
+#define MONITOR_HPP
+
+#include "Pvm.hpp"
+#include "Mutex.hpp"
 
 #define MONITOR_DONE 1
 
-#define THRESHOLD 100
-
-#define EXPORT _export __exp(&_mx);
+#define EXPORT _export _exp();
 
 class Monitor
 {
 protected:
+  Pvm & pvm;
+
   Monitor();
   ~Monitor();
-
-  class mutex
-  {
-  public:
-    void lock();
-    void unlock();
-    mutex();
-
-  private:
-    int id;
-  };
 
   class _export
   {
   public:
-    _export(mutex * mx);
+    _export();
     ~_export();
-  private:
-    mutex * mx;
   };
-
-  mutex _mx;
 
   // class condition
   // {
-  //   void wait(...);
-  //   void signal(...);
+  //   void wait();
+  //   void signal();
   // };
 
   // class sint			/* ? */
@@ -46,13 +35,10 @@ protected:
   // };
 
 private:
-  static int monitorNextId;
-  static int mutexNextId;
-  int id;
-  int tid;
-  std::vector<int> vTids;
   std::vector<int> vDone;
 
   bool done();
   void recv();
 };
+
+#endif
