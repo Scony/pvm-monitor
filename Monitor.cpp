@@ -9,12 +9,18 @@ using namespace std;
 
 Monitor * Monitor::instance = NULL;
 
+Monitor & Monitor::getInstance()
+{
+  return *instance;
+}
+
 Monitor::Monitor() :
   pvm(Pvm::getInstance())
 {
   instance = this;
   timestamp = 0;
   responses = 0;
+  conditionWaitingForRelease = -1;
 }
 
 Monitor::~Monitor()
@@ -43,6 +49,33 @@ bool Monitor::critical()
 void Monitor::recv()
 {
   int bufid;
+
+  // CONDITION_ENQUEUE
+  bufid = pvm_nrecv(-1,CONDITION_ENQUEUE);
+  if(bufid > 0)
+    {
+      int msg[2];
+      pvm_upkint(msg,2,1);
+      Condition::getInstance(msg[1]).queue.push_back(msg[0]);
+    }
+
+  // CONDITION_DEQUEUE
+  bufid = pvm_nrecv(-1,CONDITION_DEQUEUE);
+  if(bufid > 0)
+    {
+      int msg[2];
+      pvm_upkint(msg,2,1);
+      Condition::getInstance(msg[1]).queue.pop_front();
+    }
+
+  // CONDITION_SIGNAL
+  bufid = pvm_nrecv(-1,CONDITION_SIGNAL);
+  if(bufid > 0)
+    {
+      int msg;
+      pvm_upkint(&msg,1,1);
+      Condition::getInstance(msg).signalized = true;
+    }
 
   // MUTEX_REQUEST
   bufid = pvm_nrecv(-1,MUTEX_REQUEST);
@@ -79,6 +112,10 @@ void Monitor::recv()
   bufid = pvm_nrecv(-1,MUTEX_RELEASE);
   if(bufid > 0)
     {
+      // if some condition.signal() is waiting for release of waived mutex
+      if(conditionWaitingForRelease >= 0)
+	Condition::getInstance(conditionWaitingForRelease).released = true;
+
       // drop him from queue
       int msg[2];
       pvm_upkint(msg,2,1);
@@ -129,29 +166,26 @@ void Monitor::lock()
 
 void Monitor::unlock()
 {
-  if(critical())
-    {
-      cout << "unlock\n";
+  cout << "unlock\n";
 
-      // increment lamport clock
-      timestamp++;
+  // increment lamport clock
+  timestamp++;
 
-      // send MUTEX_RELEASE to all
-      int msg[2] = { pvm.tid, timestamp };
-      for(vector<int>::iterator i = pvm.vTids.begin(); i != pvm.vTids.end(); i++)
-	pvm_psend(*i,MUTEX_RELEASE,msg,2,PVM_INT);
+  // send MUTEX_RELEASE to all
+  int msg[2] = { pvm.tid, timestamp };
+  for(vector<int>::iterator i = pvm.vTids.begin(); i != pvm.vTids.end(); i++)
+    pvm_psend(*i,MUTEX_RELEASE,msg,2,PVM_INT);
 
-      // drop myself from queue
-      for(list<Element>::iterator i = queue.begin(); i != queue.end(); i++)
-	if(i->id == pvm.tid)
-	  {
-	    queue.erase(i);
-	    break;
-	  }
+  // drop myself from queue
+  for(list<Element>::iterator i = queue.begin(); i != queue.end(); i++)
+    if(i->id == pvm.tid)
+      {
+	queue.erase(i);
+	break;
+      }
 
-      // clear responses
-      responses = 0;
-    }
+  // clear responses
+  responses = 0;
 }
 
 Monitor::_export::_export()

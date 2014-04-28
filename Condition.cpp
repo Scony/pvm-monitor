@@ -1,9 +1,16 @@
+#include <iostream>
 #include "Condition.hpp"
 
-Condition::Condition()
+using namespace std;
+
+Condition::Condition() :
+  pvm(Pvm::getInstance())
 {
   id = nextId++;
   instances[id] = this;
+  signalized = false;
+  released = false;
+  cout << "C" << id << endl;
 }
 
 Condition & Condition::getInstance(int id)
@@ -13,18 +20,41 @@ Condition & Condition::getInstance(int id)
 
 void Condition::wait()
 {
-  // send CONDITION_ENQUEUE
+  // send CONDITION_ENQUEUE to all
+  int msg[2] = { pvm.tid, id };
+  for(vector<int>::iterator i = pvm.vTids.begin(); i != pvm.vTids.end(); i++)
+    pvm_psend(*i,CONDITION_ENQUEUE,msg,2,PVM_INT);
+
   // unlock()
-  // wait for signal
+  Monitor::getInstance().unlock();
+
+  // wait for CONDITION_SIGNAL
+  while(!signalized)
+    Monitor::getInstance().recv();
+  signalized = false;
+
   // send CONDITION_DEQUEUE
+  for(vector<int>::iterator i = pvm.vTids.begin(); i != pvm.vTids.end(); i++)
+    pvm_psend(*i,CONDITION_DEQUEUE,msg,2,PVM_INT);
 
 }
 
 void Condition::signal()
 {
-  // send CONDITION_SIGNAL
-  // wait for MUTEX_RELEASE
+  if(queue.size() > 0)
+    {
+      // send CONDITION_SIGNAL to first element in queue
+      int msg = id;
+      pvm_psend(queue.front(),CONDITION_SIGNAL,&msg,1,PVM_INT);
+
+      // wait for MUTEX_RELEASE
+      Monitor::getInstance().conditionWaitingForRelease = id;
+      while(!released)
+	Monitor::getInstance().recv();
+      released = false;
+      Monitor::getInstance().conditionWaitingForRelease = -1;
+    }
 }
 
 int Condition::nextId = 0;
-std::vector<Condition*> Condition::instances;
+vector<Condition*> Condition::instances;

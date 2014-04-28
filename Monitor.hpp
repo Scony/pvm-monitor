@@ -18,6 +18,11 @@
 
 class Monitor
 {
+  friend class Condition;
+
+public:
+  static Monitor & getInstance();
+
 protected:
   static Monitor * instance;
   Pvm & pvm;
@@ -40,6 +45,7 @@ protected:
 private:
   int timestamp;
   int responses;
+  int conditionWaitingForRelease;
   std::vector<int> vDone;
 
   void lock();
