@@ -169,7 +169,8 @@ void Monitor::unlock()
   cout << "unlock\n";
 
   // increment lamport clock
-  timestamp++;
+  if(critical())
+    timestamp++;
 
   // send MUTEX_RELEASE to all
   int msg[2] = { pvm.tid, timestamp };

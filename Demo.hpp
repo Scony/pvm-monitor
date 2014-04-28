@@ -5,6 +5,7 @@
 
 class Demo : public Monitor
 {
+  Condition c;
 public:
   void print();
 };
