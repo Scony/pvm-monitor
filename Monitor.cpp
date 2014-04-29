@@ -115,19 +115,21 @@ void Monitor::recv()
       // if some condition.signal() is waiting for release of waived mutex
       if(conditionWaitingForRelease >= 0)
 	Condition::getInstance(conditionWaitingForRelease).released = true;
+      else
+	{
+	  // drop him from queue
+	  int msg[2];
+	  pvm_upkint(msg,2,1);
+	  for(list<Element>::iterator i = queue.begin(); i != queue.end(); i++)
+	    if(i->id == msg[0])
+	      {
+		queue.erase(i);
+		break;
+	      }
 
-      // drop him from queue
-      int msg[2];
-      pvm_upkint(msg,2,1);
-      for(list<Element>::iterator i = queue.begin(); i != queue.end(); i++)
-	if(i->id == msg[0])
-	  {
-	    queue.erase(i);
-	    break;
-	  }
-
-      // update lamport clock
-      timestamp = (timestamp > msg[1] ? timestamp : msg[1]) + 1;
+	  // update lamport clock
+	  timestamp = (timestamp > msg[1] ? timestamp : msg[1]) + 1;
+	}
     }
 
   // MONITOR_DONE
