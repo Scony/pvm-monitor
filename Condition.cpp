@@ -10,7 +10,6 @@ Condition::Condition() :
   instances.push_back(this);
   signalized = false;
   released = false;
-  cout << "C" << id << endl;
 }
 
 Condition & Condition::getInstance(int id)
@@ -20,7 +19,9 @@ Condition & Condition::getInstance(int id)
 
 void Condition::wait()
 {
+#ifdef DEBUG
   cout << "wait\n";
+#endif
 
   // send CONDITION_ENQUEUE to all
   int msg[2] = { pvm.tid, id };
@@ -43,7 +44,9 @@ void Condition::wait()
 
 void Condition::signal()
 {
-  cout << "signal" << queue.size() << endl;
+#ifdef DEBUG
+  cout << "signal " << queue.size() << endl;
+#endif
 
   if(queue.size() > 0)
     {

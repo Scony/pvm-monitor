@@ -40,7 +40,10 @@ bool Monitor::done()
 
 bool Monitor::critical()
 {
+#ifdef DEBUG
   cout << responses << "::" << pvm.vTids.size() << "::" << queue.size() << endl;
+#endif
+
   if(responses == pvm.vTids.size() && queue.front().id == pvm.tid)
     return true;
   return false;
@@ -147,7 +150,9 @@ void Monitor::recv()
 
 void Monitor::lock()
 {
+#ifdef DEBUG
   cout << "lock\n";
+#endif
 
   // increment lamport clock
   timestamp++;
@@ -168,7 +173,9 @@ void Monitor::lock()
 
 void Monitor::unlock()
 {
+#ifdef DEBUG
   cout << "unlock\n";
+#endif
 
   // increment lamport clock
   if(critical())
