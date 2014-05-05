@@ -16,6 +16,8 @@
 
 #define EXPORT _export _exp;
 
+#define DEBUG
+
 class Monitor
 {
   friend class Condition;
@@ -36,11 +38,6 @@ protected:
     _export();
     ~_export();
   };
-
-  // class sint			/* ? */
-  // {
-  //   /* operators */
-  // };
 
 private:
   int timestamp;
