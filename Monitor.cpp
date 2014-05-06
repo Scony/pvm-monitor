@@ -51,11 +51,15 @@ bool Monitor::critical()
 
 void Monitor::recv()
 {
-  int bufid;
+  int bufid = pvm_recv(-1,-1);
+  if(bufid < 0)
+    return;
+
+  int nvm, tag;
+  pvm_bufinfo(bufid,&nvm,&tag,&nvm);
 
   // SCHAR_SYNCHRONIZATION
-  bufid = pvm_nrecv(-1,SCHAR_SYNCHRONIZATION);
-  if(bufid > 0)
+  if(tag == SCHAR_SYNCHRONIZATION)
     {
       int nChars = Schar::instances.size();
       char msg[nChars];
@@ -66,8 +70,7 @@ void Monitor::recv()
     }
 
   // CONDITION_ENQUEUE
-  bufid = pvm_nrecv(-1,CONDITION_ENQUEUE);
-  if(bufid > 0)
+  if(tag == CONDITION_ENQUEUE)
     {
       int msg[2];
       pvm_upkint(msg,2,1);
@@ -75,8 +78,7 @@ void Monitor::recv()
     }
 
   // CONDITION_DEQUEUE
-  bufid = pvm_nrecv(-1,CONDITION_DEQUEUE);
-  if(bufid > 0)
+  if(tag == CONDITION_DEQUEUE)
     {
       int msg[2];
       pvm_upkint(msg,2,1);
@@ -84,8 +86,7 @@ void Monitor::recv()
     }
 
   // CONDITION_SIGNAL
-  bufid = pvm_nrecv(-1,CONDITION_SIGNAL);
-  if(bufid > 0)
+  if(tag == CONDITION_SIGNAL)
     {
       int msg;
       pvm_upkint(&msg,1,1);
@@ -93,8 +94,7 @@ void Monitor::recv()
     }
 
   // MUTEX_REQUEST
-  bufid = pvm_nrecv(-1,MUTEX_REQUEST);
-  if(bufid > 0)
+  if(tag == MUTEX_REQUEST)
     {
       // add to queue & sort it
       int inMsg[2];
@@ -111,8 +111,7 @@ void Monitor::recv()
     }
 
   // MUTEX_RESPONSE
-  bufid = pvm_nrecv(-1,MUTEX_RESPONSE);
-  if(bufid > 0)
+  if(tag == MUTEX_RESPONSE)
     {
       // increment responses
       int msg[2];
@@ -124,8 +123,7 @@ void Monitor::recv()
     }
 
   // MUTEX_RELEASE
-  bufid = pvm_nrecv(-1,MUTEX_RELEASE);
-  if(bufid > 0)
+  if(tag == MUTEX_RELEASE)
     {
       // if some condition.signal() is waiting for release of waived mutex
       if(conditionWaitingForRelease >= 0)
@@ -148,16 +146,12 @@ void Monitor::recv()
     }
 
   // MONITOR_DONE
-  bufid = pvm_nrecv(-1,MONITOR_DONE);
-  if(bufid > 0)
+  if(tag == MONITOR_DONE)
     {
       int who;
       pvm_upkint(&who,1,1);
       vDone.push_back(who);
     }
-
-  // dont waste CPU
-  usleep(100000);
 }
 
 void Monitor::lock()
