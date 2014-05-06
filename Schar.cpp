@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Schar.hpp"
 
 Schar::Schar()

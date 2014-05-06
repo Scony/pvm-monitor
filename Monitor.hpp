@@ -6,6 +6,7 @@
 #include "Pvm.hpp"
 #include "Condition.hpp"
 #include "Schar.hpp"
+#include "Sint.hpp"
 
 #define MONITOR_DONE 1
 #define MUTEX_REQUEST 2
@@ -21,6 +22,7 @@
 #define DEBUG
 
 typedef Schar schar;
+typedef Sint sint;
 
 class Monitor
 {

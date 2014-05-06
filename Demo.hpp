@@ -6,7 +6,7 @@
 class Demo : public Monitor
 {
   Condition c;
-  schar sc[4];
+  sint x;
 public:
   void print();
 };
