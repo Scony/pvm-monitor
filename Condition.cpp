@@ -50,6 +50,9 @@ void Condition::signal()
 
   if(queue.size() > 0)
     {
+      // synchronize shared data
+      Monitor::getInstance().sync();
+
       // send CONDITION_SIGNAL to first element in queue
       int msg = id;
       pvm_psend(queue.front(),CONDITION_SIGNAL,&msg,1,PVM_INT);

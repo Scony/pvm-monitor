@@ -6,6 +6,7 @@
 class Demo : public Monitor
 {
   Condition c;
+  schar sc[4];
 public:
   void print();
 };

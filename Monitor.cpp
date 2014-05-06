@@ -53,6 +53,18 @@ void Monitor::recv()
 {
   int bufid;
 
+  // SCHAR_SYNCHRONIZATION
+  bufid = pvm_nrecv(-1,SCHAR_SYNCHRONIZATION);
+  if(bufid > 0)
+    {
+      int nChars = Schar::instances.size();
+      char msg[nChars];
+      pvm_upkbyte(msg,nChars,1);
+      int j = 0;
+      for(vector<Schar*>::iterator i = Schar::instances.begin(); i != Schar::instances.end(); i++)
+	*(*i) = msg[j++];
+    }
+
   // CONDITION_ENQUEUE
   bufid = pvm_nrecv(-1,CONDITION_ENQUEUE);
   if(bufid > 0)
@@ -177,6 +189,9 @@ void Monitor::unlock()
   cout << "unlock\n";
 #endif
 
+  // synchronize shared data
+  sync();
+
   // increment lamport clock
   if(critical())
     timestamp++;
@@ -196,6 +211,20 @@ void Monitor::unlock()
 
   // clear responses
   responses = 0;
+}
+
+void Monitor::sync()
+{
+  int nChars = Schar::instances.size();
+  if(nChars > 0)
+    {
+      char msg[nChars];
+      int j = 0;
+      for(vector<Schar*>::iterator i = Schar::instances.begin(); i != Schar::instances.end(); i++)
+	msg[j++] = *(*i);
+      for(vector<int>::iterator i = pvm.vTids.begin(); i != pvm.vTids.end(); i++)
+	pvm_psend(*i,SCHAR_SYNCHRONIZATION,msg,nChars,PVM_BYTE);
+    }
 }
 
 Monitor::_export::_export()

@@ -5,6 +5,7 @@
 
 #include "Pvm.hpp"
 #include "Condition.hpp"
+#include "Schar.hpp"
 
 #define MONITOR_DONE 1
 #define MUTEX_REQUEST 2
@@ -13,10 +14,13 @@
 #define CONDITION_ENQUEUE 5
 #define CONDITION_DEQUEUE 6
 #define CONDITION_SIGNAL 7
+#define SCHAR_SYNCHRONIZATION 8
 
 #define EXPORT _export _exp;
 
 #define DEBUG
+
+typedef Schar schar;
 
 class Monitor
 {
@@ -48,6 +52,7 @@ private:
   void lock();
   void unlock();
   void recv();
+  void sync();
 
   bool done();
   bool critical();

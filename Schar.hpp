@@ -5,15 +5,21 @@
 
 class Schar
 {
+  friend class Monitor;
+
 public:
   Schar();
+
+public:
+  operator char();
+  Schar & operator=(const Schar &rhs);
+  Schar & operator=(const char &rhs);
+
 private:
-  int id;
   char value;
 
 private:
   static std::vector<Schar*> instances;
-  static int nextId;
 };
 
 #endif
