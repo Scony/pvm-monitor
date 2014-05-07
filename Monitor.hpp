@@ -21,8 +21,11 @@
 
 #define DEBUG
 
+class Condition;
+
 typedef Schar schar;
 typedef Sint sint;
+typedef Condition condition;
 
 class Monitor
 {

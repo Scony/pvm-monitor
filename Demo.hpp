@@ -3,12 +3,26 @@
 
 #include "Monitor.hpp"
 
+#define THINKING 1
+#define STARVING 2
+#define EATING 3
+
+#define PHILOSOPHERS 5
+
 class Demo : public Monitor
 {
-  Condition c;
-  sint x;
 public:
-  void print();
+  Demo();
+  void grab();
+  void put();
+
+private:
+  bool isAlone(int id);
+
+private:
+  int id;
+  schar state[PHILOSOPHERS];
+  condition alone[PHILOSOPHERS];
 };
 
 #endif
